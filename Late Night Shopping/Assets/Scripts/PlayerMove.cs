@@ -6,9 +6,9 @@ using UnityEngine;
 
 public class PlayerMove : MonoBehaviour
 {
-    public float speed = 25f;
-    public float slowspeed = 10f;
-    public float fastspeed = 40f;
+    public float speed;
+    public float slowspeed;
+    public float fastspeed;
 
 
     public float mouseSens = 100f;
@@ -39,16 +39,25 @@ public class PlayerMove : MonoBehaviour
         float horizontal = Input.GetAxisRaw("Horizontal");
         float vertical = Input.GetAxisRaw("Vertical");
 
-        //transform.localPosition += new Vector3(horizontal, 0, vertical) * Time.deltaTime * speed;
-        //rb.velocity = new Vector3(horizontal * 100, -2, vertical * 100);
-        rb.AddForce(transform.forward * vertical * speed);
-        rb.AddForce(transform.right * horizontal * speed);
+        // 1. Create a combined move direction from inputs
+        Vector3 moveDirection = (transform.right * horizontal + transform.forward * vertical);
+
+        // 2. Normalize so diagonal input doesn't exceed a magnitude of 1
+        moveDirection = moveDirection.normalized;
+
+        // 3. Apply force once
+        rb.AddForce(moveDirection * speed);
+
+        // 4. Clamp the horizontal velocity (X and Z) so it never exceeds your max speed (e.g., 5)
+        Vector3 flatVel = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
+        if (flatVel.magnitude > 5f)
+        {
+            Vector3 limitedVel = flatVel.normalized * 5f;
+            rb.velocity = new Vector3(limitedVel.x, rb.velocity.y, limitedVel.z);
+        }
 
         float mouseX = Input.GetAxis("Mouse Y") * mouseSens * Time.deltaTime;
         float mouseY = Input.GetAxis("Mouse X") * mouseSens * Time.deltaTime;
-
-        //transform.Rotate(Vector3.up * mouseX);
-        //transform.Rotate(Vector3.right * mouseY);
 
         pitch += mouseX * -1;
         yaw += mouseY;
