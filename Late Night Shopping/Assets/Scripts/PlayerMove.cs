@@ -61,7 +61,7 @@ public class PlayerMove : MonoBehaviour
 
         pitch += mouseX * -1;
         yaw += mouseY;
-        pitch = Mathf.Clamp(pitch, -20, 20);
+        pitch = Mathf.Clamp(pitch, -40, 40);
 
         ViewCamera.transform.localEulerAngles = new Vector3(pitch, 0, 0);
 

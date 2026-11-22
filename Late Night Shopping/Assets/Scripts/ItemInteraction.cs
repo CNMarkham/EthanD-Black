@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class ItemInteraction : MonoBehaviour
 {
-    public Camera playerCamera;     // Your first-person camera
-    public Transform holdPoint;     // The empty object where the item sits in your hand
-    public float pickupRange = 3f;  // How close you need to be to grab it
+    public Camera playerCamera;     
+    public Transform holdPoint;     
+    public float pickupRange = 3f;  
 
     private GameObject heldItem;
 
@@ -24,6 +24,14 @@ public class ItemInteraction : MonoBehaviour
             if (heldItem == null)
             {
                 TryPickUp();
+            }
+        }
+
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            if (heldItem != null)
+            {
+                DropItem();
             }
         }
     }
@@ -67,5 +75,32 @@ public class ItemInteraction : MonoBehaviour
         heldItem.transform.SetParent(holdPoint);
         heldItem.transform.localPosition = Vector3.zero;
         heldItem.transform.localRotation = Quaternion.identity;
+    }
+
+    void DropItem()
+    {
+        if (heldItem == null)
+        {
+            return;
+        }
+
+        // 1. Turn off gravity and physics so it stays floating in your hand
+        Rigidbody rb = heldItem.GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+            rb.isKinematic = false;
+        }
+
+        // 2. Turn off its collider so it doesn't bump into your player body
+        Collider col = heldItem.GetComponent<Collider>();
+        if (col != null)
+        {
+            col.enabled = true;
+        }
+
+        // 3. Parent the item to your hand and snap it to the exact spot
+        heldItem.transform.SetParent(null);
+
+        heldItem = null;
     }
 }
